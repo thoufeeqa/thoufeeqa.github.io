@@ -241,10 +241,10 @@
                     if(targetManeuver == 0)
     //                  Debug.Log("Xec Straight");
                     
-
+                    //wait for maneuverTime
                     yield return new WaitForSeconds (maneuverTime);
                     if (i == movcache.keylist.Count - 1)
-                        keepgoing = false;
+                        keepgoing = false; //stop if you've reached the end of the instruction set
                 }
             }
         }
@@ -253,13 +253,26 @@
         {
 
             float newManeuver = targetManeuver * speed;
+            // Manipulate velocity depending on maneuver
             playerRigidbody.velocity = new Vector3 (newManeuver, 0.0f, forwardSpeed);
 
-            playerRigidbody.rotation = Quaternion.Lerp (playerRigidbody.rotation, Quaternion.Euler (0.0f, newManeuver * tilt, 0.0f), Time.deltaTime * bodyTurnSmoothing);
-            frontAxle.transform.rotation = Quaternion.Lerp (frontAxle.transform.rotation, Quaternion.Euler (-90.0f, newManeuver * wheelTilt, 0.0f), Time.deltaTime * axleTurnSmoothing);
+            // Rotate rover towards movement direction
+            playerRigidbody.rotation = Quaternion.Lerp (playerRigidbody.rotation, 
+                                                        Quaternion.Euler (0.0f, newManeuver * tilt, 0.0f), 
+                                                        Time.deltaTime * bodyTurnSmoothing);
+            
+            //Rotate axles towards turn direction
+            frontAxle.transform.rotation = Quaternion.Lerp (frontAxle.transform.rotation, 
+                                                            Quaternion.Euler (-90.0f, newManeuver * wheelTilt, 0.0f), 
+                                                            Time.deltaTime * axleTurnSmoothing);
 
         }
         
+
+
+
+
+
 
 
 
