@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>Thoufeeq Ahamed ~ Portfolio</title>
+    <meta content="" name="description">
+    <meta content="#2CC7C1" name="theme-color">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="img/favicon.png" rel="shortcut icon">
+    <link href="css/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/highlightjsstyles/atom-one-dark.css">
+    <script src="./js/highlight.pack.js"></script>
+    <script>
+    hljs.initHighlightingOnLoad();
+    </script>
+</head>
+
+<body>
+    <div class="content" id="content">
+        <div class="introduction-block pad-top-60 pad-bottom-60 container">
+            <div class="clear pad-top-30 pad-bottom-20">
+                <div class="col-12-l">
+                    <a class="button" href="index.html" target="_blank">Go Back</a>
+                    <h2 class="uppercase pad-bottom-10 text-center">Classifier</h2>
+                    <div class="card">
+                        <div class="card-block">
+                            <pre style= "padding:0px"><code>
+       #implements random forest classifier with tf-idf term weighting also
+
+    import dateutil.parser as dparser
+    import pandas as pd
+    from bs4 import BeautifulSoup
+    import re
+    from nltk.corpus import stopwords
+    from sklearn.feature_extraction.text import CountVectorizer
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.ensemble import RandomForestClassifier
+    import numpy as np
+    from firebase import firebase
+    from firebase_token_generator import create_token
+    import sys
+    import datetime
+    import json
+    import os
+
+
+    #Authentication for firebase
+    class FirebaseAuthenticationNew(firebase.FirebaseAuthentication):
+        def get_user(self):
+            token = create_token($TOKEN, auth_payload)
+            user_id = self.extra.get('id')
+            return firebase.FirebaseUser(self.email, token, self.provider, user_id)
+
+    #source and target buckets
+    firebase_in = firebase.FirebaseApplication($SOURCE_BUCKET, None)
+    firebase_out = firebase.FirebaseApplication($TARGET_BUCKET, None)
+
+    firebaseauthentication=FirebaseAuthenticationNew($AUTH_TOKEN,$EMAIL,extra=$EXT)
+    firebase_out.authentication=firebaseauthentication
+
+    #add trainer file here
+    train = pd.read_csv($TRAINING_FILE_PATH, header=0, delimiter=",")  
+
+    #extracts indiviual words from article, ignores punctuation
+    def article_to_words (raw_article):
+        article_text = BeautifulSoup(raw_article).get_text()
+        letters_only = re.sub("[^a-zA-Z]", " ", article_text)
+        words = letters_only.lower().split()
+        stops = set(stopwords.words("english"))
+        meaningful_words = [w for w in words if w not in stops]
+        
+        return(" ".join(meaningful_words))
+
+    num_articles = train["content"].size
+    clean_train_articles = []
+
+    for i in xrange(0, num_articles):
+
+        #print "Article %d of %d \n" %(i+1, num_articles)
+
+        clean_train_articles.append(article_to_words(train["content"][i]))
+
+    #Tf-Idf for word weighting. Gives weights to words of higher importance within the text.
+    # importance calculated by the number of times a word appears. 
+    # Weights are offset for words that are frequently used in the english language (and, or, etc.)
+    vectorizer = TfidfVectorizer(min_df=1,analyzer="word", tokenizer= None, preprocessor= None, stop_words=None, max_features=6000)
+
+    #apply vectorizer on articles and collect feature array.
+    train_data_features = vectorizer.fit_transform(clean_train_articles)
+    train_data_features = train_data_features.toarray()
+
+
+    vocab = vectorizer.get_feature_names()
+    dist = np.sum(train_data_features, axis =0)
+
+    print "Training RFC...."
+
+    #Random forest classifier. Uses weight vectors from previous phase to classify articles
+    forest = RandomForestClassifier(n_estimators=100)
+    forest = forest.fit(train_data_features, train["cat"]) #cat = category
+
+    print "Done training"
+
+    dblist = $SOURCE_DBLIST_ARRAY
+
+    for db in dblist:
+        print "Performing operations for database: ",db
+        l=[]
+        existing_links=[]
+        print "Retrieving database..."
+        existing_items=firebase_out.get($TARGET_BUCKET,None)
+        if existing_items: #gets existing links to prevent duplicate entries
+            for linkiter,link in existing_items.iteritems():
+                existing_links.append(link['link'])
+
+        sourcedata = firebase_in.get(db , None)
+        for i,sel in sourcedata.iteritems():
+            l.append(sel)
+
+        test = pd.DataFrame(l)
+
+        clean_test_articles =[]
+        num_testarticles = test["content"].size
+        print "Cleaning articles, parsing... \n"
+
+        for i in xrange (0,len(test["content"])):
+            clean_review = article_to_words(test["content"][i])
+            clean_test_articles.append(clean_review)
+
+        test_data_features = vectorizer.transform(clean_test_articles)
+        test_data_features = test_data_features.toarray()
+
+        # final result of prediction
+        result = forest.predict(test_data_features)
+
+        tempdata = []
+        for sel,title,date,link,cont in zip(result,test["title"],test["date"],test["link"],test["content"]):
+            if sel != 0:
+                if(type(date)!=float):
+                    parsed_date=dparser.parse(date,fuzzy=True)
+                    strdate=parsed_date.strftime('%d/%m/%Y')
+                    tempdata.append([title,sel,strdate,link,cont])
+
+
+        print "number of funding articles = ", len(tempdata)
+        output = pd.DataFrame(columns=["cat","title","date","link","content"])
+        count = 0
+        for sel in tempdata:
+            output.set_value(count,"cat",sel[1])
+            output.set_value(count,"title", sel[0])
+            output.set_value(count,"date", sel[2])
+            output.set_value(count,"link",sel[3])
+            output.set_value(count,"content",sel[4])
+            count+=1
+        
+        print "Pushing to firebase now..."
+        pushlength=len(tempdata)
+        for x,push in output.iterrows():
+            if(push['link'] not in existing_links):
+                pushdata={
+                        'link':push['link'],
+                        'date':push['date'],
+                        'title':push['title'],
+                        'content':push['content'],
+                        'imgsrc':push['imgsrc']
+                        'cat':push['cat']
+
+                        }
+                firebase_out.post($TARGET_BUCKET,pushdata)
+                print "Pushed link: ",push['link']
+        
+        print "done pushing for db: ",db
+
+
+
+
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="introduction-block pad-top-60 pad-bottom-60 container">
+            <div class="clear pad-top-30 pad-bottom-20">
+                <div class="col-12-l">
+                    <a class="button" href="index.html" target="_blank">Go Back</a>
+                    <h2 class="uppercase pad-bottom-10 text-center">TAGGER</h2>
+                    <div class="card">
+                        <div class="card-block">
+                            <pre style= "padding:0px"><code>
+    import pandas as pd
+    from operator import itemgetter
+    from nltk.tag import StanfordNERTagger
+    from nltk.tokenize import word_tokenize
+    from nltk import pos_tag
+    from nltk.chunk import conlltags2tree
+    from nltk.tree import Tree
+    import time
+    import re
+    import string
+    from firebase import firebase
+    from firebase_token_generator import create_token
+    import math
+    import os
+
+
+    class FirebaseAuthenticationNew(firebase.FirebaseAuthentication):   #Custom class that correct authnetication problems with existing firebase-python library
+        def get_user(self):
+            token = create_token($TOKEN, auth_payload)
+            user_id = self.extra.get('id')
+            return firebase.FirebaseUser(self.email, token, self.provider, user_id)
+    firebaseapp = firebase.FirebaseApplication($APP_NAME, None)
+    firebaseauthentication=FirebaseAuthenticationNew($AUTH,$EMAIL,extra={'id':123})
+    firebaseapp.authentication=firebaseauthentication
+
+    start = time.time()
+
+    l=[]
+    existing_links=[]
+    print "Getting source dataset"
+    result = firebaseapp.get($SOURCE_BUCKET , None)
+
+    print "Getting target dataset"   #dump target dataset to compare and drop duplicates
+    existing_items = firebaseapp.get($TARGET_BUCKET, None)
+    if existing_items:
+        for key,item in existing_items.iteritems():
+            existing_links.append(item['stage']['storylink'])
+
+    for i,sel in result.iteritems():
+        if sel['link'] not in existing_links:
+            l.append(sel)
+        else:
+            print "Skipping link, already exists", sel['link']
+
+
+    f = pd.DataFrame(l)
+
+    len = f["title"].size
+    st = StanfordNERTagger($TAGGER_TRAINED_FILE_CONTENT) #invoke termsheet's NER classifier
+    sttitle=StanfordNERTagger($TAGGER_TRAINED_FILE_TITLE)
+
+    print len
+    start0 = time.time()
+    nerlist = []
+    titlenerlist=[]
+    templist=[]
+
+    for i in xrange(0,len):
+        if(f["cat"][i]==1):
+            nerlist.append(st.tag(((f["title"][i]+' '+f["content"][i]).split())))    #load title/content to tagger
+            titlenerlist.append(sttitle.tag((f["title"][i]).split()))
+
+    for i,sel in enumerate(nerlist):
+            x= (str(f["date"][i]),u"DATE")
+            sel.insert(0,x)
+
+    #print "tner:", titlenerlist
+    start1 = time.time()
+    def stanfordNE2BIO(tagged_sent):        #Function basically separates different NERs and tags for further processing
+        bio_tagged_sent = []
+        prev_tag = "O"
+        for token, tag in tagged_sent:
+            if tag == "O": #O
+                bio_tagged_sent.append((token, tag))
+                prev_tag = tag
+                continue
+            if tag != "O" and prev_tag == "O": # Begin NE
+                bio_tagged_sent.append((token, "B-"+tag))
+                prev_tag = tag
+            elif prev_tag != "O" and prev_tag == tag: # Inside NE
+                bio_tagged_sent.append((token, "I-"+tag))
+                prev_tag = tag
+            elif prev_tag != "O" and prev_tag != tag: # Adjacent NE
+                bio_tagged_sent.append((token, "B-"+tag))
+                prev_tag = tag
+
+        #print "these are BIO tagged \n\n", bio_tagged_sent
+        return bio_tagged_sent
+
+    def stanfordNE2tree(ne_tagged_sent):        #NER tags processed to a tree
+        bio_tagged_sent = stanfordNE2BIO(ne_tagged_sent)
+        sent_tokens, sent_ne_tags = zip(*bio_tagged_sent)
+        sent_pos_tags = [pos for token, pos in pos_tag(sent_tokens)]
+        sent_conlltags = [(token, pos, ne) for token, pos, ne in zip(sent_tokens, sent_pos_tags, sent_ne_tags)]
+        ne_tree = conlltags2tree(sent_conlltags)
+        return ne_tree
+
+    cleanlist =[]
+    titlecleanlist=[]
+
+    print "Tagging content"
+    for sel in nerlist:
+            ne_tree = stanfordNE2tree(sel)
+
+            ne_in_sent = []
+            for subtree in ne_tree:
+                if type(subtree) == Tree: # If subtree is a noun chunk, i.e. NE != "O"
+                    ne_label = subtree.label()
+                    ne_string = " ".join([token for token, pos in subtree.leaves()])
+                    ne_in_sent.append((ne_string, ne_label))
+            cleanlist.append(ne_in_sent)
+
+    print "Tagging Titles"
+    for tsel in titlenerlist:
+            ne_tree = stanfordNE2tree(tsel)
+            ne_in_sent = []
+            for subtree in ne_tree:
+                if type(subtree) == Tree: # If subtree is a noun chunk, i.e. NE != "O"
+                    ne_label = subtree.label()
+                    ne_string = " ".join([token for token, pos in subtree.leaves()])
+                    ne_in_sent.append((ne_string, ne_label))
+            titlecleanlist.append(ne_in_sent)
+
+    for i,sel in enumerate(cleanlist):
+        str = f["title"][i]
+        x= (str,u"TITLE")
+        sel.insert(0,x)
+
+    for i,sel in enumerate(cleanlist):
+        str = f["link"][i]
+        x= (str,u"LINK")
+        sel.insert(0,x)
+
+    sortlist=[]
+    for sel in cleanlist:
+            sortlist.append(sorted(sel, key=itemgetter(1)))
+
+    titlesortlist=[]
+    for tsel in titlecleanlist:
+            titlesortlist.append(sorted(tsel, key=itemgetter(1)))
+
+
+    start2 = time.time()
+
+    lenlist = sortlist.__len__()
+    rows = xrange(0, lenlist)
+
+    df = pd.DataFrame(columns=['Date','Startup','Money','Organization','FundStage','Space','Title',
+                               'Competitors','Location','Founders','Storylink','TStartup',
+                               'TOrganization','TMoney','TFundStage'])
+
+    print "Entering dataframe..."
+    start3 = time.time()
+    print "Working on content"
+
+    for count,sel in enumerate(sortlist):
+        txto = ''
+        txts = ''
+        txtl = ''
+        txtm = ''
+        txtc = ''
+        txtf = ''
+        for i in sel:
+            if i[1] == 'MON':
+                mon_str=i[0].replace(',','')    #removes commas from money
+                df.set_value(count,'Money',mon_str)
+                if txtm=='':
+                    txtm = mon_str
+                else:
+                    txtm = txtm+','+mon_str
+                df.set_value(count,"Money",txtm)
+
+            elif i[1] == 'LOC':
+                df.set_value(count, 'Location', i[0])
+
+            elif i[1] == 'LINK':
+                df.set_value(count, 'Storylink', i[0])
+
+            elif i[1] == 'TITLE':
+                df.set_value(count, 'Title', i[0])
+
+            elif i[1]== 'STG':
+                df.set_value(count,'FundStage',i[0])
+
+            elif i[1]== 'SPC':
+                df.set_value(count,'Space',i[0])
+
+            elif i[1]== 'DATE':
+                df.set_value(count,'Date',i[0])
+
+            elif i[1] == 'STRT':
+                if txts=='':
+                    txts = i[0]
+                else:
+                    txts = txts+','+i[0]
+                df.set_value(count,'Startup',txts)
+
+            elif i[1] == 'ORG':
+                if txto=='':
+                    txto = i[0]
+                else:
+                    txto = txto+','+i[0]
+                df.set_value(count,"Organization",txto)
+
+            elif i[1] == 'FOUN':
+                if txtf=='':
+                    txtf = i[0]
+                else:
+                    txtf = txtf+','+i[0]
+                df.set_value(count,"Founders",txtf)
+
+            elif i[1] == 'COMP':
+                if txtc=='':
+                    txtc = i[0]
+                else:
+                    txtc = txtc+','+i[0]
+                df.set_value(count,"Competitors",txtc)
+
+    print "Working on titles"
+
+    for count,tsel in enumerate(titlesortlist):
+        for i in tsel:
+            txt =''
+            txts=''
+            if i[1] == 'MON':
+                mon_str=i[0].replace(',','')    #removes commas from money
+                df.set_value(count,'TMoney',mon_str)
+                if txt=='':
+                    txt = mon_str
+                else:
+                    txt = txt+','+mon_str
+                df.set_value(count,"TMoney",txt)
+
+            elif i[1]== 'STG':
+                df.set_value(count,'TFundStage',i[0])
+
+            elif i[1] == 'STRT':
+                if txts=='':
+                    txts = i[0]
+                else:
+                    txts = txts+','+i[0]
+                df.set_value(count,'TStartup',txts)
+
+            elif i[1] == 'ORG':
+                if txt=='':
+                    txt = i[0]
+                else:
+                    txt = txt+','+i[0]
+                #print "txt=",txt
+                df.set_value(count,"TOrganization",txt)
+
+
+    powers = {'billion': 10 ** 9, 'million': 10 ** 6, 'm': 10 ** 6, 'mn': 10 ** 6,
+              'M': 10 ** 6, 'Mn': 10 ** 6, 'MN': 10 ** 6, 'K': 10 ** 3, 'k' : 10**3,
+              'Cr': 10 ** 7,'cr': 10 ** 7,'Crore': 10 ** 7, 'crore': 10 ** 7,'B':10**9,'Billion':10**9,'b':10**9}
+
+    print "Normalizing values..."
+
+    for i,dfsel in df.iterrows():
+        if type(dfsel.Money) != float:
+            print dfsel.Money
+            match = re.search(r"(\\$|USD|Rs|INR|rs|.)\s?(\d[0-9\.]+)\s?(million|mn|Mn|M|MN|crore|cr|Cr|Crore|k|K|B|Bn|billion|Billion)", dfsel.Money)      #make the currency part better
+            secondmatch = re.search(r"(Rs|INR|rs|.)\s?(\d[0-9\.]+)\s?", dfsel.Money)
+            if match is not None:
+                    curr = match.group(1)
+                    quantity = match.group(3)
+                    magnitude = match.group(2)
+                    x = float(magnitude) * powers[quantity]
+                    y=int(x)
+                    if curr == '$' or curr == 'USD':
+                        fin =  'USD '+unicode(y)
+                        df.set_value(i,'Money',fin)
+                    elif curr == 'Rs' or curr =='rs' or curr == 'INR':
+                        fin = 'INR '+unicode(y)
+                        df.set_value(i,'Money',fin)
+            elif secondmatch is not None:
+                curr =secondmatch.group(0)
+                quant = secondmatch.group(1)
+                if curr == '$' or curr:
+                    fin = 'USD '+unicode(quant)
+
+        if type(dfsel.TMoney) != float:
+            match = re.search(r"(\\$|USD|Rs|INR|rs|.)\s?(\d[0-9\.]+)\s?(million|mn|Mn|M|MN|crore|cr|Cr|Crore|k|K|B|Bn|billion|Billion)", dfsel.TMoney)      #make the currency part better
+            secondmatch = re.search(r"(Rs|INR|rs|.)\s?(\d[0-9\.]+)\s?", dfsel.TMoney)
+            if match is not None:
+                    curr = match.group(1)
+                    quantity = match.group(3)
+                    magnitude = match.group(2)
+                    x = float(magnitude) * powers[quantity]
+                    y=int(x)
+                    if curr == '$' or curr == 'USD':
+                        fin =  'USD '+unicode(y)
+                        df.set_value(i,'TMoney',fin)
+                    elif curr == 'Rs' or curr =='rs' or curr == 'INR':
+                        fin = 'INR '+unicode(y)
+                        df.set_value(i,'TMoney',fin)
+            elif secondmatch is not None:
+                curr =secondmatch.group(0)
+                quant = secondmatch.group(1)
+                if curr == '$' or curr:
+                    fin = 'USD '+unicode(quant)
+
+
+    for i,sel in enumerate(df.FundStage):
+        if type(sel)!=float:
+            match = re.search(r"((Series|series)+\s([a-zA-Z]{1}))",sel)
+            angel_match = re.search(r"(Angel|angel){1}[-|\s]*(funding|Funding)",sel)
+            seed_match = re.search(r"(Early|early|seed|Seed)[-|\s]*(funding|Funding|stage|Stage)",sel)
+
+            if match is not None:
+                round = match.group(3)
+                fund_stg =  'Series '+round
+                df.set_value(i,'FundStage',fund_stg)
+
+            elif angel_match is not None:
+                df.set_value(i,'FundStage','Angel Round')
+
+            elif seed_match is not None:
+                df.set_value(i,'FundStage','Seed Round')
+
+    for i,sel in enumerate(df.TFundStage):
+        if type(sel)!=float:
+            match = re.search(r"((Series|series)+\s([a-zA-Z]{1}))",sel)
+            angel_match = re.search(r"(Angel|angel){1}[-|\s]*(funding|Funding)",sel)
+            seed_match = re.search(r"(Early|early|seed|Seed)[-|\s]*(funding|Funding|stage|Stage)",sel)
+
+            if match is not None:
+                round = match.group(3)
+                fund_stg =  'Series '+round
+                df.set_value(i,'TFundStage',fund_stg)
+
+            elif angel_match is not None:
+                df.set_value(i,'TFundStage','Angel Round')
+
+            elif seed_match is not None:
+                df.set_value(i,'TFundStage','Seed Round')
+
+
+    def list_uniq(seq):
+       # Not order preserving
+       keys = {}
+       for e in seq:
+           keys[e] = 1
+       return keys.keys()
+
+    table = string.maketrans("","")
+
+    for i,dfsel in df.iterrows():
+        curr = ['$', 'USD', 'INR']
+        if type(dfsel.Organization)!=float:
+            pre_org_row = dfsel.Organization.split(',')
+            org_row = filter(None, list_uniq(pre_org_row))
+        else:
+            org_row=[]
+
+        if type(dfsel.Money)!=float:
+            pre_mon_row = dfsel.Money.split(',')
+            mon_row = filter(None, list_uniq(pre_mon_row))
+        else:
+            mon_row=[]
+
+        if type(dfsel.Founders)!=float:
+            pre_founder_row = dfsel.Founders.split(',')
+            founder_row = filter(None, list_uniq(pre_founder_row))
+        else:
+            founder_row=[]
+        if type(dfsel.Startup)!=float:
+            pre_startup_row = dfsel.Startup.split(',')
+            startup_row = filter(None, list_uniq(pre_startup_row))
+        else:
+            startup_row=[]
+
+        for rowsel in org_row[:]:
+                if 'undisclosed' in rowsel:
+                    org_row.remove(rowsel)
+                match = re.search(r"([$|USD|INR|Rs])(\d+(?:\.\d{2})?)", rowsel)
+                if match:
+                    org_row.remove(rowsel)
+
+        for st in startup_row[:]:
+            for y in org_row[:]:
+                if st==y:
+                    startup_row.remove(st)
+
+        for x in founder_row[:]:
+            for y in org_row[:]:
+                if x==y:
+                    org_row.remove(y)
+
+        for mon in mon_row[:]:
+            match=re.search(r"^[a-zA-Z ]*$",mon)
+            if match:
+                mon_row.remove(mon)
+
+
+        df.set_value(i,'Organization',','.join(org_row))
+        df.set_value(i,'Money',','.join(mon_row))
+
+        startup_row_c=[]
+
+
+
+        if startup_row.__len__()>1:
+            for trow in startup_row:
+                if trow in dfsel.Title:
+                    startup_row_c.append(trow)
+                    startup_row=startup_row_c
+
+        df.set_value(i,'Startup',','.join(startup_row))
+
+    def filterator(a,b):
+        if a!=None and b!=None:
+            return (a+','+b)
+        elif a==None:
+            return b
+        elif b==None:
+            return a
+        else:
+            return 'No Data'
+
+
+    df = df.where((pd.notnull(df)), None)
+    for x,sel in df.iterrows():
+
+        if sel['TStartup']!=None:
+            startup = sel['TStartup']
+        else:
+            startup = filterator(sel['Startup'],sel['TStartup'])
+
+        if sel['TMoney']!=None:
+            money = sel['TMoney']
+        else:
+            money = filterator(sel['Money'],sel['TMoney'])
+
+        if sel['TFundStage']!=None:
+            stage = sel['TFundStage']
+        else:
+            stage = filterator(sel['FundStage'],sel['TFundStage'])
+
+        orgs = filterator(sel['Organization'],sel['TOrganization'])
+
+        test = {
+                'startup':startup,
+                'founders': sel['Founders'],
+                'stage': {
+                    'name':stage,
+                    'date':sel['Date'],
+                    'organization':orgs,
+                    'money':money,
+                    'newstitle':sel['Title'],
+                    'storylink':sel['Storylink']
+                }
+            }
+
+        print(test)
+        firebaseapp.post($TARGET_BUCKET, test)
+
+
+    print time.time()-start
+    print time.time()-start0
+    print time.time()-start1
+    print time.time()-start2
+    print time.time()-start3
+
+</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+    <script src="js/vendor/jquery-1.11.3.min.js">
+    </script>
+    <script src="js/vendor/webfontloader.js">
+    </script>
+    <script src="js/vendor/jquery.mobile.custom.min.js">
+    </script>
+    <script src="js/vendor/bootstrap.transition.js">
+    </script>
+    <script src="js/vendor/bootstrap.carousel.js">
+    </script>
+    <script src="js/vendor/bootstrap.collapse.js">
+    </script>
+    <script src="js/vendor/bootstrap.dropdown.js">
+    </script>
+    <script src="js/vendor/bootstrap.tab.js">
+    </script>
+    <script src="js/vendor/jquery.drawsvg.js">
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false">
+    </script>
+    <script src="js/default.js">
+    </script>
+    <script src="js/modal.js" type="text/javascript">
+    </script>
+</body>
+
+</html>
