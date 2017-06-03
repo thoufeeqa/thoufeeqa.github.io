@@ -27,7 +27,10 @@
                     <div class="card">
                         <div class="card-block">
                             <pre style= "padding:0px"><code>
-       #implements random forest classifier with tf-idf term weighting also
+    #implements Random Forest classifier with tf-idf term weighting.
+
+    #Parses articles and classifies into two buckets: fuding related and non-funding related
+    #funding related articles are pushed to a database containting the artile link, main article image, content, date
 
     import dateutil.parser as dparser
     import pandas as pd
@@ -135,7 +138,7 @@
         # final result of prediction
         result = forest.predict(test_data_features)
 
-        tempdata = []
+        tempdata = [] #stores intermediate json array
         for sel,title,date,link,cont in zip(result,test["title"],test["date"],test["link"],test["content"]):
             if sel != 0:
                 if(type(date)!=float):
@@ -176,6 +179,9 @@
 
 
 
+
+
+
 </code></pre>
                         </div>
                     </div>
@@ -190,6 +196,46 @@
                     <div class="card">
                         <div class="card-block">
                             <pre style= "padding:0px"><code>
+    # Tags articles collected from database containing funding articles classified previously
+    # Tagger runs on the article content, and on the article title.
+    # most of the information is contained within the title (startup, primary investors, fuding amount)
+
+    # secondary information (secondary information, founders, previous funding rounds) 
+    # and data related to other startups may be contained within the content.
+
+    # information collected from the title and content are compared in the end
+    # dulpicates are removed and any secondary information is also added.
+
+    #tagged data results in a tuple
+    # for example : Techcrunch rasies Series C by Sequoia for $10 million gets tagged as:
+    # [ (Techcrunch, 'STRT'), (Series C, 'STG') ('Sequoia', 'ORG'), ('$10 million', MON) ]
+
+    #KEYS
+    # 'LOC': Location
+    # 'LINK': article link
+    # 'TITLE': article title
+    # 'STG': funding stage
+    # 'SPC': insdustry the startup is in
+    # 'DATE': date of article
+    # 'STRT': startup name
+    # 'ORG': investors
+    # 'FOUN': founders
+
+
+    #extracted info is pushed to a database
+    # {
+    #             'startup':,
+    #             'founders':,
+    #             'stage': {
+    #                 'name':,
+    #                 'date':,
+    #                 'organization':,
+    #                 'money':,
+    #                 'newstitle':,
+    #                 'storylink':
+    #             }
+
+
     import pandas as pd
     from operator import itemgetter
     from nltk.tag import StanfordNERTagger
@@ -212,22 +258,25 @@
             user_id = self.extra.get('id')
             return firebase.FirebaseUser(self.email, token, self.provider, user_id)
     firebaseapp = firebase.FirebaseApplication($APP_NAME, None)
-    firebaseauthentication=FirebaseAuthenticationNew($AUTH,$EMAIL,extra={'id':123})
+    firebaseauthentication=FirebaseAuthenticationNew($AUTH,$EMAIL,extra=$EXT)
     firebaseapp.authentication=firebaseauthentication
 
     start = time.time()
 
     l=[]
     existing_links=[]
+
     print "Getting source dataset"
     result = firebaseapp.get($SOURCE_BUCKET , None)
 
-    print "Getting target dataset"   #dump target dataset to compare and drop duplicates
+    #dump target dataset to compare and drop duplicates
+    print "Getting target dataset"   
     existing_items = firebaseapp.get($TARGET_BUCKET, None)
     if existing_items:
         for key,item in existing_items.iteritems():
             existing_links.append(item['stage']['storylink'])
 
+    #skil existing links
     for i,sel in result.iteritems():
         if sel['link'] not in existing_links:
             l.append(sel)
@@ -238,27 +287,35 @@
     f = pd.DataFrame(l)
 
     len = f["title"].size
-    st = StanfordNERTagger($TAGGER_TRAINED_FILE_CONTENT) #invoke termsheet's NER classifier
+
+    #invoke custom NER classifier file
+    st = StanfordNERTagger($TAGGER_TRAINED_FILE_CONTENT) 
     sttitle=StanfordNERTagger($TAGGER_TRAINED_FILE_TITLE)
 
-    print len
+    print "number of articles -->", len
     start0 = time.time()
+
+    #list to hold named entities frm content and story title.
     nerlist = []
     titlenerlist=[]
     templist=[]
 
+    #load title/content to tagger
     for i in xrange(0,len):
         if(f["cat"][i]==1):
-            nerlist.append(st.tag(((f["title"][i]+' '+f["content"][i]).split())))    #load title/content to tagger
+            nerlist.append(st.tag(((f["title"][i]+' '+f["content"][i]).split())))    
             titlenerlist.append(sttitle.tag((f["title"][i]).split()))
 
+    #insert date values to final dataframe
     for i,sel in enumerate(nerlist):
             x= (str(f["date"][i]),u"DATE")
             sel.insert(0,x)
 
-    #print "tner:", titlenerlist
+
     start1 = time.time()
-    def stanfordNE2BIO(tagged_sent):        #Function basically separates different NERs and tags for further processing
+
+    #Function separates different NERs and tags for further processing
+    def stanfordNE2BIO(tagged_sent):        
         bio_tagged_sent = []
         prev_tag = "O"
         for token, tag in tagged_sent:
@@ -276,10 +333,10 @@
                 bio_tagged_sent.append((token, "B-"+tag))
                 prev_tag = tag
 
-        #print "these are BIO tagged \n\n", bio_tagged_sent
         return bio_tagged_sent
 
-    def stanfordNE2tree(ne_tagged_sent):        #NER tags processed to a tree
+    #NER tags processed to a tree
+    def stanfordNE2tree(ne_tagged_sent):        
         bio_tagged_sent = stanfordNE2BIO(ne_tagged_sent)
         sent_tokens, sent_ne_tags = zip(*bio_tagged_sent)
         sent_pos_tags = [pos for token, pos in pos_tag(sent_tokens)]
@@ -291,18 +348,22 @@
     titlecleanlist=[]
 
     print "Tagging content"
+
     for sel in nerlist:
+
+            #convert content to NER tree
             ne_tree = stanfordNE2tree(sel)
 
-            ne_in_sent = []
+            ne_in_sent = [] #holds named entities in gathered an article
             for subtree in ne_tree:
-                if type(subtree) == Tree: # If subtree is a noun chunk, i.e. NE != "O"
+                if type(subtree) == Tree: # check if subtree is a noun chunk, i.e. NE != "O"
                     ne_label = subtree.label()
                     ne_string = " ".join([token for token, pos in subtree.leaves()])
                     ne_in_sent.append((ne_string, ne_label))
             cleanlist.append(ne_in_sent)
 
     print "Tagging Titles"
+
     for tsel in titlenerlist:
             ne_tree = stanfordNE2tree(tsel)
             ne_in_sent = []
@@ -313,15 +374,18 @@
                     ne_in_sent.append((ne_string, ne_label))
             titlecleanlist.append(ne_in_sent)
 
+    # get titles and insert to final dataframe
     for i,sel in enumerate(cleanlist):
         str = f["title"][i]
         x= (str,u"TITLE")
         sel.insert(0,x)
 
+    # get links and insert to final dataframe
     for i,sel in enumerate(cleanlist):
         str = f["link"][i]
         x= (str,u"LINK")
         sel.insert(0,x)
+
 
     sortlist=[]
     for sel in cleanlist:
@@ -337,6 +401,8 @@
     lenlist = sortlist.__len__()
     rows = xrange(0, lenlist)
 
+    #final dataframe structure
+    # keys prefixed with a 'T' are extracted from the title only.
     df = pd.DataFrame(columns=['Date','Startup','Money','Organization','FundStage','Space','Title',
                                'Competitors','Location','Founders','Storylink','TStartup',
                                'TOrganization','TMoney','TFundStage'])
@@ -346,15 +412,17 @@
     print "Working on content"
 
     for count,sel in enumerate(sortlist):
-        txto = ''
-        txts = ''
-        txtl = ''
-        txtm = ''
-        txtc = ''
-        txtf = ''
+        txto = ''   #holds cleaned versions of organization
+        txts = ''   #holds cleaned versions of startup
+        txtl = ''   #holds cleaned versions of location
+        txtm = ''   #holds cleaned versions of money
+        txtc = ''   #holds cleaned versions of competitors
+        txtf = ''   #holds cleaned versions of fundstage
+
+        #loop checks final tagged data, cleans if required, and adds to dataframe
         for i in sel:
             if i[1] == 'MON':
-                mon_str=i[0].replace(',','')    #removes commas from money
+                mon_str=i[0].replace(',','')    #removes commas from monetary values
                 df.set_value(count,'Money',mon_str)
                 if txtm=='':
                     txtm = mon_str
@@ -410,6 +478,7 @@
 
     print "Working on titles"
 
+    #loop checks final tagged data, cleans if required, and adds to dataframe (works on article titles)
     for count,tsel in enumerate(titlesortlist):
         for i in tsel:
             txt =''
@@ -448,6 +517,7 @@
 
     print "Normalizing values..."
 
+    # Normalizes currency values
     for i,dfsel in df.iterrows():
         if type(dfsel.Money) != float:
             print dfsel.Money
@@ -471,6 +541,7 @@
                 if curr == '$' or curr:
                     fin = 'USD '+unicode(quant)
 
+    # Normalizes currency values (Article titles)
         if type(dfsel.TMoney) != float:
             match = re.search(r"(\\$|USD|Rs|INR|rs|.)\s?(\d[0-9\.]+)\s?(million|mn|Mn|M|MN|crore|cr|Cr|Crore|k|K|B|Bn|billion|Billion)", dfsel.TMoney)      #make the currency part better
             secondmatch = re.search(r"(Rs|INR|rs|.)\s?(\d[0-9\.]+)\s?", dfsel.TMoney)
@@ -492,7 +563,7 @@
                 if curr == '$' or curr:
                     fin = 'USD '+unicode(quant)
 
-
+    # Normalizes Funding stage values
     for i,sel in enumerate(df.FundStage):
         if type(sel)!=float:
             match = re.search(r"((Series|series)+\s([a-zA-Z]{1}))",sel)
@@ -510,6 +581,7 @@
             elif seed_match is not None:
                 df.set_value(i,'FundStage','Seed Round')
 
+    # Normalizes Funding stage values (Article titles)
     for i,sel in enumerate(df.TFundStage):
         if type(sel)!=float:
             match = re.search(r"((Series|series)+\s([a-zA-Z]{1}))",sel)
@@ -528,6 +600,7 @@
                 df.set_value(i,'TFundStage','Seed Round')
 
 
+    # filters unique values in a set of tags 
     def list_uniq(seq):
        # Not order preserving
        keys = {}
@@ -537,6 +610,7 @@
 
     table = string.maketrans("","")
 
+    # filtering unique values for each datapoint
     for i,dfsel in df.iterrows():
         curr = ['$', 'USD', 'INR']
         if type(dfsel.Organization)!=float:
@@ -590,8 +664,6 @@
 
         startup_row_c=[]
 
-
-
         if startup_row.__len__()>1:
             for trow in startup_row:
                 if trow in dfsel.Title:
@@ -600,6 +672,7 @@
 
         df.set_value(i,'Startup',','.join(startup_row))
 
+    # utility function that combines to fields if they're populated, (acts like an OR operator)
     def filterator(a,b):
         if a!=None and b!=None:
             return (a+','+b)
@@ -611,6 +684,7 @@
             return 'No Data'
 
 
+    #combine results of title tags and content tags
     df = df.where((pd.notnull(df)), None)
     for x,sel in df.iterrows():
 
@@ -645,6 +719,8 @@
             }
 
         print(test)
+
+        #push to database
         firebaseapp.post($TARGET_BUCKET, test)
 
 
@@ -653,6 +729,8 @@
     print time.time()-start1
     print time.time()-start2
     print time.time()-start3
+
+
 
 </code></pre>
                         </div>
