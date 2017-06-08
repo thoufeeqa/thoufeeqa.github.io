@@ -125,20 +125,135 @@
                             <iframe width="900" height="508" src="https://www.youtube.com/embed/6NOp7EUswXo" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
                         </div>
                     </div>
-                    <div class="card" style="padding: 20px">
-                        <div class="card-block">
-                            <h3 class="card-title">Tesselated Landscape Materials</h3>
-                            <p class="card-text">Normal maps don't work very well in VR, especially at close range or when viewed head on. This is a tesselated set of materials that can be painted onto a landscape. Tesselation is applied only at close range, and after that it eases out gradually until normal maps take over at longer distances from the camera. Height maps were used to make the blend between the types of terrain look smoother. This maintained performance while adding more depth to the terrain. ( This also had a set of maps for ambient occlusion, which when baked, looked very realistic. However, I haven't showed this in the video. )</p>
-                            <iframe width="900" height="508" src="https://www.youtube.com/embed/RnYlD2sDKyA" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
-                        </div>
-                    </div>
-                    <div class="card" style="padding: 20px">
+                    <!-- <div class="card" style="padding: 20px">
                         <div class="card-block">
                             <h3 class="card-title">Curtains with APEX cloth physics</h3>
                             <p class="card-text">We wanted cloth that was dynamic and behaved differently depending on wind speed and strength.</p>
                             <p class="card-text">I used a simple planar mesh which was then imported into Nvidia's APEX cloth tool where I spent a lot of time experimenting until I got it just the way I wanted. APEX files were generated and brought into Unreal.</p>
                             <p class="card-text">I also created a material that resembled light fabric. Slighty translucent with subsurface scattering added so that light shines through and shadows fall on the inner side.</p>
                             <iframe width="900" height="508" src="https://www.youtube.com/embed/LoNcpVy1xsE" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                        </div>
+                    </div> -->
+                    <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Indoor Lighting</h3>
+                            <p class="card-text">This scene was created to showcase high quality lighting for indoor scenes.</p>
+                            <p class="card-text">I used techniques that I learnt while working on an architecture visualization project. It demanded detailed texturing and extremely realistic lighting, and also had to work without a hitch in VR.</p>
+                            <p class="card-text">All of the lighting is static. Shadows and ambient occlusion are baked in and are not screen-space effects.</p>
+                            <p class="card-text">This is just a demonstration of technique and is not the actual environment made for the project. I've used only stock assets available in Unreal Engine and a lot of white surfaces in this scene to emphasise shadow detail and lighting quality</p>
+                            <h4> DAY </h4>
+                            <div id="myCarouselDay" class="carousel slide" data-ride="carousel" style="padding-bottom: 50px">
+                                <!-- Wrapper for slides -->
+                                <div class="carousel-inner" style="width:100%">
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day01.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day02.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day03.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day04.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day05.png" style="width:100%">
+                                    </div>
+                                    <div class="item active">
+                                        <img src="./img/lighting_samples/day06.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day07.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day08.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day09.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day10.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day11.png" style="width:100%">
+                                    </div>
+                                   <!--  <div class="item">
+                                        <img src="./img/lighting_samples/day12.png" style="width:100%">
+                                    </div> -->
+                                </div>
+                                <!-- Left and right controls -->
+                                <a class="left carousel-control" href="#myCarouselDay" data-slide="prev">
+                                    <span class="glyphicon glyphicon-chevron-left"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="right carousel-control" href="#myCarouselDay" data-slide="next">
+                                    <span class="glyphicon glyphicon-chevron-right"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </div>
+                            <h4>NIGHT</h4>
+                            <div id="myCarouselNight" class="carousel slide" data-ride="carousel">
+                               
+                                <!-- Wrapper for slides -->
+                                <div class="carousel-inner" style="width:100%">
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night01.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night02.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night03.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night04.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night05.png" style="width:100%">
+                                    </div>
+                                    <div class="item active">
+                                        <img src="./img/lighting_samples/night06.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night07.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night08.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night09.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night10.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night11.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night12.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night13.png" style="width:100%">
+                                    </div>
+                                </div>
+                                <!-- Left and right controls -->
+                                <a class="left carousel-control" href="#myCarouselNight" data-slide="prev">
+                                    <span class="glyphicon glyphicon-chevron-left"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="right carousel-control" href="#myCarouselNight" data-slide="next">
+                                    <span class="glyphicon glyphicon-chevron-right"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Tesselated Landscape Materials</h3>
+                            <p class="card-text">Normal maps don't work very well in VR, especially at close range or when viewed head on. This is a tesselated set of materials that can be painted onto a landscape. Tesselation is applied only at close range, and after that it eases out gradually until normal maps take over at longer distances from the camera. Height maps were used to make the blend between the types of terrain look smoother. This maintained performance while adding more depth to the terrain. ( This also had a set of maps for ambient occlusion, which when baked, looked very realistic. However, I haven't showed this in the video. )</p>
+                            <iframe width="900" height="508" src="https://www.youtube.com/embed/RnYlD2sDKyA" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
                         </div>
                     </div>
                     <div class="card" style="padding: 20px">
