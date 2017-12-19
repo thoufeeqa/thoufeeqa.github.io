@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>Thoufeeq Ahamed ~ Portfolio</title>
+    <meta content="" name="description">
+    <meta content="#2CC7C1" name="theme-color">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="img/favicon.png" rel="shortcut icon">
+    <link href="css/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/highlightjsstyles/darcula.css">
+    <script src="./js/highlight.pack.js"></script>
+    <script>
+    hljs.initHighlightingOnLoad();
+    </script>
+    <script>
+    (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-98664396-2', 'auto');
+    ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+    <div class="banner pad-top-45 pad-bottom-45 pad-top-60-m pad-bottom-60-m">
+        <div class="container text-center pad-top-20-m pad-bottom-20-m pad-top-55-l pad-bottom-25-l">
+            <h1 class="banner-heading">THOUFEEQ AHAMED</h1>
+            <h2 class="banner-heading">portfolio</h2>
+        </div>
+    </div>
+    <div class="content" id="content">
+        <div class="introduction-block pad-top-60 pad-bottom-60 container">
+            <div class="clear pad-top-30 pad-bottom-20">
+                <div class="col-12-l">
+                    <h2 class="uppercase pad-bottom-10 text-center">Code</h2>
+                    <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Facial Feature Recognition using OpenCV</h3>
+                            <p class="card-text">This project was part of an overall video analytics research project between the <a href="http://www.barc.gov.in/">Bhaba Atomic Research Centre, Mumbai</a>and the <a href="http://www.au-kbc.org/">AU-KBC research centre</a> at the Madras Institute of Technology. My research group was in charge of the face recognition system.</p>
+                            <p class="card-text">Normal face recognition systems are vulnerable to changes in lighting and pose. We decided to combine the strengths of two models, the Dense Scale Invariant Transform (DSIFT) and the Deformable Parts Model (DPM). Using the strengths of both these models improved recognition robustness in low light conditions, and upto a 30 degree tilt in head pose.</p>
+                            <p class="card-text">The project was a collaborative effort between two other undergraduate researchers, a postgraduate guide, a professor who was our research guide, and a research representative from BARC, Mumbai. </p>
+                            <p class="card-text">Since this was an undergraduate research project, the thesis proposal and development was carried out by my peers and I, with the rest of the team playing a guiding role. </p>
+                            <p class="card-text">The source code is of two parts, one trains the system and the other is the one deployed to recognize faces.</p><a class="button" href="https://github.com/thoufeeqa/facereco_dpmdsift" target="_blank">Source Code</a> <a class="button" href="https://drive.google.com/open?id=0B3Qs6NjQJ3QlREo5RlZXbGwtM1k" target="_blank">Paper</a>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Venture deal information extractor</h3>
+                            <p class="card-text">This is an early prototype of the information extraction system I developed during my time at Termsheet.</p>
+                            <p class="card-text">The overall system consists of three parts : various crawlers that extracted articles from websites, news sources and RSS feeds on the internet, a classfifer that decided if an articles was related to venture deals, and a tagger that extracted relevant information such as the startup being funded, amount of money invested, the founders and the firm funding them, among other things.</p>
+                            <p class="card-text">Information extracted from the tagger allowed us to quickly filter and keep track of deals taking place globally</p>
+                            <p class="card-text">The classifier implements a Random Forest classifier that operates on words weighted by the Tf-idf function (term frequency, inverse document frequency). Basically, words appearing multiple times in an article are weighted as more important (Term frequency). Inverse document frequency offsets these weights based on the frequency of words that appear more frequently in general (words like 'the', 'and'). The Random forest classifier has to be trained initially and uses these term weights to decides if an article belongs in a set or not.</p>
+                            <p class="card-text">The tagger implements Stanford's NER library (Named Entity Recognition). This model also has to be trained first. Long hours were spent intially training the tagger to extract items that were important to us in funding articles. A system was then created to allow us to edit articles tagged incorrectly, and feed the corrections back into the training source to improve accuracy over time.</p>
+                            <a class="button" href="code_tagclass.html" target="_blank">Source Code</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clear pad-top-30 pad-bottom-20">
+                <div class="col-12-l">
+                    <h2 class="uppercase pad-bottom-10 text-center">Gameplay</h2>
+                    <div class="card" style="padding: 20px">
+                    </div>
+                    <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Rover Rover - A Memory Game (Game Jam Project)</h3>
+                            <p class="card-text">This was one of my early pet projects, built in Unity</p>
+                            <p class="card-text">I took part in a game jam with a time limit of four hours and a theme centered around memory games.</p>
+                            <p class="card-text">The aim is to manoeuvre a rover across a terrain with obstacles placed randomly. The catch however, is that you need to pre-program a set of instructions to the rover before it starts moving; a nod to how engineers have to send a set of instructions to execute, due to the amount of time it takes for signals to travel from the earth to the Moon...or Mars.</p>
+                            <p class="card-text">The player is given 3 lives per level and the obstacles on each level are procedurally generated. The player explores the terrain and has to memorise the correct sequence of instructions to give (Right, Left or Forward) as they progress and get to the end of the stage.</p>
+                            <p class="card-text">The rover and the obstacles were modelled by me, using Blender. I don't know how to animate that well, so each of the axles in the rover are rotated using code instead and the rover body is parented to these axles. So when it's turning, there's basically one section of the code manipulating the rover's overall movement, and another section of code that's rotating the axles at the same time.</p>
+                            <iframe width="900" height="508" src="https://youtube.com/embed/XiI1HTHqxZ4" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                            <div style="display: inline-block; margin: 10px; margin-left:30px">
+                                <img src="./img/rover_mini/rover_ss1.png" style="width: 320px; height:190px; display:inline ; padding: 5px">
+                                <img src="./img/rover_mini/rover_ss2.png" style="width: 320px; height:190px; display:inline; padding: 5px">
+                                <img src="./img/rover_mini/rover_ss3.png" style="width: 320px; height:190px; display:inline; padding: 5px">
+                            </div>
+                            <a class="button" href="code_rover.html" target="_blank">Source Code</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clear pad-top-20 pad-bottom-20">
+                <div class="col-12-l">
+                    <h2 class="uppercase pad-bottom-10 text-center">Art</h2>
+                    <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Martian Rover Model</h3>
+                            <p class="card-text">Modelled in Blender, rendered using Unreal Engine. The scratches on the edges were done using Substance Painter and exported as alpha maps. The final body paint material was made in Unreal. The dust on tires are just noise maps on top of a rubber-like material</p>
+                            <iframe allowfullscreen frameborder="0" width="900" height="508" src="https://player.vimeo.com/video/219281514" style="display:block ; margin: auto"></iframe>
+                            <div id="myCarouselRover" class="carousel slide" data-ride="carousel" style="padding-top: 20px">
+                               
+                                <!-- Wrapper for slides -->
+                                <div style="padding-bottom: 20px">
+                                <div class="carousel-inner" style="max-height: 500px">
+                                    <div class="item active">
+                                        <img src="./img/big_rover/bgrover1.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/big_rover/bgrover2.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/big_rover/bgrover3.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/big_rover/bgrover4.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/big_rover/bgrover5.png" style="width:100%">
+                                    </div>
+                                </div>
+                                </div>
+                                <!-- Left and right controls -->
+                                <a class="left carousel-control" href="#myCarouselRover" data-slide="prev">
+                                    <span class="glyphicon glyphicon-chevron-left"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="right carousel-control" href="#myCarouselRover" data-slide="next">
+                                    <span class="glyphicon glyphicon-chevron-right"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </div>
+                            <!-- <div style="display: inline-block; margin: 10px; margin-left:30px">
+                                <img src="./img/big_rover/bgrover1.png" style="width: 320px; height:190px; display:inline ; padding: 5px">
+                                <img src="./img/big_rover/bgrover2.png" style="width: 320px; height:190px; display:inline ; padding: 5px">
+                                <img src="./img/big_rover/bgrover3.png" style="width: 320px; height:190px; display:inline ; padding: 5px">
+                                <img src="./img/big_rover/bgrover4.png" style="width: 320px; height:190px; display:inline ; padding: 5px">
+                                <img src="./img/big_rover/bgrover5.png" style="width: 320px; height:190px; display:inline ; padding: 5px">
+                            </div> -->
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Rock Pattern Texture</h3>
+                            <p class="card-text">Made for a VR puzzle-based escape game that I'm working on</p>
+                            <p class="card-text">Made and rendered using Substance designer. Completely pricedural, using just a primitive circle shape</p>
+                            <iframe width="900" height="508" src="https://www.youtube.com/embed/hPMuygXXuOQ" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Mosaic Texture</h3>
+                            <p class="card-text">Another completely procedural texture, made with square and circle shapes, warped and modified to make a mosaic texture. There is some distressing applied at the edges to show some wear.</p>
+                            <iframe width="900" height="508" src="https://www.youtube.com/embed/6NOp7EUswXo" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                        </div>
+                    </div>
+                    <!-- <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Curtains with APEX cloth physics</h3>
+                            <p class="card-text">We wanted cloth that was dynamic and behaved differently depending on wind speed and strength.</p>
+                            <p class="card-text">I used a simple planar mesh which was then imported into Nvidia's APEX cloth tool where I spent a lot of time experimenting until I got it just the way I wanted. APEX files were generated and brought into Unreal.</p>
+                            <p class="card-text">I also created a material that resembled light fabric. Slighty translucent with subsurface scattering added so that light shines through and shadows fall on the inner side.</p>
+                            <iframe width="900" height="508" src="https://www.youtube.com/embed/LoNcpVy1xsE" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                        </div>
+                    </div> -->
+                    <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Indoor Lighting</h3>
+                            <p class="card-text">This scene was created to showcase high quality lighting for indoor scenes.</p>
+                            <p class="card-text">I used techniques that I learnt while working on an architecture visualization project. It demanded detailed texturing and extremely realistic lighting.</p>
+                            <p class="card-text">All of the lighting is static. Shadows and ambient occlusion are baked in and are not screen-space effects.</p>
+                            <p class="card-text">This is just a demonstration of technique and is not the actual environment made for the project. I've used only stock assets available in Unreal Engine and a lot of white surfaces in this scene to emphasise shadow detail and lighting quality</p>
+                            <h4> DAY </h4>
+                            <div id="myCarouselDay" class="carousel slide" data-ride="carousel" style="padding-bottom: 50px">
+                                <!-- Wrapper for slides -->
+                                <div class="carousel-inner" style="width:100%">
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day01.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day02.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day03.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day04.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day05.png" style="width:100%">
+                                    </div>
+                                    <div class="item active">
+                                        <img src="./img/lighting_samples/day06.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day07.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day08.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day09.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day10.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/day11.png" style="width:100%">
+                                    </div>
+                                   <!--  <div class="item">
+                                        <img src="./img/lighting_samples/day12.png" style="width:100%">
+                                    </div> -->
+                                </div>
+                                <!-- Left and right controls -->
+                                <a class="left carousel-control" href="#myCarouselDay" data-slide="prev">
+                                    <span class="glyphicon glyphicon-chevron-left"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="right carousel-control" href="#myCarouselDay" data-slide="next">
+                                    <span class="glyphicon glyphicon-chevron-right"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </div>
+                            <h4>NIGHT</h4>
+                            <div id="myCarouselNight" class="carousel slide" data-ride="carousel">
+                               
+                                <!-- Wrapper for slides -->
+                                <div class="carousel-inner" style="width:100%">
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night01.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night02.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night03.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night04.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night05.png" style="width:100%">
+                                    </div>
+                                    <div class="item active">
+                                        <img src="./img/lighting_samples/night06.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night07.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night08.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night09.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night10.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night11.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night12.png" style="width:100%">
+                                    </div>
+                                    <div class="item">
+                                        <img src="./img/lighting_samples/night13.png" style="width:100%">
+                                    </div>
+                                </div>
+                                <!-- Left and right controls -->
+                                <a class="left carousel-control" href="#myCarouselNight" data-slide="prev">
+                                    <span class="glyphicon glyphicon-chevron-left"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="right carousel-control" href="#myCarouselNight" data-slide="next">
+                                    <span class="glyphicon glyphicon-chevron-right"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Tesselated Landscape Materials</h3>
+                            <p class="card-text">Normal maps don't work very well in VR, especially at close range or when viewed head on. This is a tesselated set of materials that can be painted onto a landscape. Tesselation is applied only at close range, and after that it eases out gradually until normal maps take over at longer distances from the camera. Height maps were used to make the blend between the types of terrain look smoother. This maintained performance while adding more depth to the terrain.</p>
+                            <iframe width="900" height="508" src="https://www.youtube.com/embed/RnYlD2sDKyA" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                        </div>
+                    </div>
+                    <div class="card" style="padding: 20px">
+                        <div class="card-block">
+                            <h3 class="card-title">Waterfall Material</h3>
+                            <p class="card-text">Using particle effects to make a waterfall was pretty but computationally demanding</p>
+                            <p class="card-text">Instead, I made a waterfall shader that closely mimics it. This applied on a curved mesh.</p>
+                            <p class="card-text">The material has diffuse and normal maps for large, medium and small waves. This is so that that the water looks like it has some depth to it. Smaller waves travel faster on the surface, and tha larger ones travel slower to make it look like they're deeper.</p>
+                            <p class="card-text">The material starts with a blue color tint but turns white towards the edge of the waterfall to mimic the way water goes from calm to chaotic at the edge. This is completely editable within the material too. The clipping point can be shifted up or down depending on the curvature of the mesh. Wave speed and sizes can be changed, both in the horizontal and vertical directions.</p>
+                            <p class="card-text">The only place it falls short is around rocks placed in the water. I've used scene depth effects to mimic some chaos aorund the rock, but this still needs more work to improve realism.</p>
+                            <iframe width="900" height="508" src="https://www.youtube.com/embed/7-UYmgLJmHk" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            <div class="container" style="padding-bottom:50px">
+                <div class=col-6>
+                    <p style="color: white; padding-left:15px">Thoufeeq Ahamed</p>
+                    <p style="color: white; padding-left:15px">a.thofik@gmail.com</p>
+                </div>
+                <!-- <div class=col-6>
+                    <p style="color: white ; text-align:right">Application Number: 00825669</p>
+                    <p style="color: white ; text-align:right">Applicant ID: 301353852</p>
+                </div> -->
+            </div>
+        </div>
+        <script src="js/vendor/jquery-1.11.3.min.js">
+        </script>
+        <script src="js/vendor/webfontloader.js">
+        </script>
+        <script src="js/vendor/jquery.mobile.custom.min.js">
+        </script>
+        <script src="js/vendor/bootstrap.transition.js">
+        </script>
+        <script src="js/vendor/bootstrap.carousel.js">
+        </script>
+        <script src="js/vendor/bootstrap.collapse.js">
+        </script>
+        <script src="js/vendor/bootstrap.dropdown.js">
+        </script>
+        <script src="js/vendor/bootstrap.tab.js">
+        </script>
+        <script src="js/vendor/jquery.drawsvg.js">
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?sensor=false">
+        </script>
+        <script src="js/default.js">
+        </script>
+        <script src="js/modal.js" type="text/javascript">
+        </script>
+</body>
+
+</html>

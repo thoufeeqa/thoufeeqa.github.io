@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>Thoufeeq Ahamed</title>
+    <meta content="" name="description">
+    <meta content="#2CC7C1" name="theme-color">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="img/favicon.png" rel="shortcut icon">
+    <link href="css/styles.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/highlightjsstyles/darcula.css">
+    <script src="./js/highlight.pack.js"></script>
+    <script>
+    hljs.initHighlightingOnLoad();
+    </script>
+    <script>
+    (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-98664396-2', 'auto');
+    ga('send', 'pageview');
+    </script>
+</head>
+
+<body>
+    <nav>
+        <div class="container">
+            <div class="flex-row-m">
+                <h1 class="banner-heading" style="color:#1502ff "><a href="index.html">THOUFEEQ AHAMED</h1>
+                <a style="padding-right: 30px" href="index.html">work</a>
+                <a style="padding-right: 30px" href="about.html">about</a>
+            </div>
+        </div>
+    </nav>
+    <!-- <div class="banner pad-top-45 pad-bottom-45 pad-top-60-m pad-bottom-60-m" style="background-color: #1502ff">
+        <div class="container text-center pad-top-20-m pad-bottom-20-m pad-top-55-l pad-bottom-25-l">
+            <h1 class="banner-heading">THOUFEEQ AHAMED</h1>
+           
+        </div>
+        <div class="container text-center">
+            <a style="color: white">WORK</a>
+            <a style="color: white">ABOUT</a>
+        </div>
+    </div> -->
+    <div class="content" id="content" style="background-color: #ffffff">
+        <div class="introduction-block pad-top-60 pad-bottom-60 container">
+            <div class="clear pad-top-30 pad-bottom-20">
+                <!-- heading row -->
+                <div class="flex-row-m">
+                    <div class="col-12-m">
+                        <h2>Texturing</h2>
+                        <h4></h4>
+                    </div>
+                </div>
+                <!-- image row -->
+                <div class=flex-row-m>
+                    <div class="col-12-m">
+                        <h4 style="padding-top: 20px">Rock Pattern Texture</h4>
+                        <p>Made for a VR puzzle-based escape game that I'm working on</p>
+                        <p>Procedural, using circle primitives, and made using Substance Designer</p>
+                        <iframe width="900" height="508" src="https://www.youtube.com/embed/hPMuygXXuOQ" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                    </div>
+                </div>
+                <div class=flex-row-m>
+                    <div class="col-12-m">
+                        <h4 style="padding-top: 20px">Mosaic Texture</h4>
+                        <p>Another completely procedural texture, made with square and circle primitives, warped and modified to make a mosaic texture. There is some distressing applied at the edges to show some wear.</p>
+                        <iframe width="900" height="508" src="https://www.youtube.com/embed/6NOp7EUswXo" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                    </div>
+                </div>
+                <div class=flex-row-m>
+                    <div class="col-12-m">
+                        <h4 style="padding-top: 20px">Curtains with APEX cloth physics</h4>
+                        <p>We wanted cloth that was dynamic and behaved differently depending on wind speed and strength.</p>
+                        <p>I used a simple planar mesh which was then imported into Nvidia's APEX cloth tool where I spent a lot of time experimenting until I got it just the way I wanted. APEX files were generated and brought into Unreal.</p>
+                        <p>I also created a material that resembled light fabric. Slighty translucent with subsurface scattering added so that light shines through and shadows fall on the inner side.</p>
+                        <iframe width="900" height="508" src="https://www.youtube.com/embed/LoNcpVy1xsE" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                    </div>
+                </div>
+                <div class=flex-row-m>
+                    <div class="col-12-m">
+                        <h4 style="padding-top: 20px">Tesselated Landscape Materials</h4>
+                        <p class="card-text">Normal maps don't work very well in VR, especially at close range or when viewed head on. This is a tesselated set of materials that can be painted onto a landscape. Tesselation is applied only at close range, and after that it eases out gradually until normal maps take over at longer distances from the camera. Height maps were used to make the blend between the types of terrain look smoother. This maintained performance while adding more depth to the terrain.</p>
+                        <iframe width="900" height="508" src="https://www.youtube.com/embed/RnYlD2sDKyA" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                    </div>
+                </div>
+                <div class=flex-row-m>
+                    <div class="col-12-m">
+                        <h4 style="padding-top: 20px">Waterfall Material</h4>
+                        <p class="card-text">Using particle effects to make a waterfall was pretty but computationally demanding</p>
+                        <p class="card-text">Instead, I made a waterfall shader that closely mimics it. This applied on a curved mesh.</p>
+                        <p class="card-text">The material has diffuse and normal maps for large, medium and small waves. This is so that that the water looks like it has some depth to it. Smaller waves travel faster on the surface, and tha larger ones travel slower to make it look like they're deeper.</p>
+                        <p class="card-text">The material starts with a blue color tint but turns white towards the edge of the waterfall to mimic the way water goes from calm to chaotic at the edge. This is completely editable within the material too. The clipping point can be shifted up or down depending on the curvature of the mesh. Wave speed and sizes can be changed, both in the horizontal and vertical directions.</p>
+                        <p class="card-text">The only place it falls short is around rocks placed in the water. I've used scene depth effects to mimic some chaos aorund the rock, but this still needs more work to improve realism.</p>
+                        <iframe width="900" height="508" src="https://www.youtube.com/embed/7-UYmgLJmHk" frameborder="0" allowfullscreen style="display:block ; margin: auto"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="footer-copyright">
+        <div class="container" style="padding-bottom:50px">
+            <div class=col-6>
+                <p style="color: white; padding-left:15px">Thoufeeq Ahamed</p>
+                <p style="color: white; padding-left:15px">a.thofik@gmail.com</p>
+            </div>
+            <!-- <div class=col-6>
+                    <p style="color: white ; text-align:right">Application Number: 00825669</p>
+                    <p style="color: white ; text-align:right">Applicant ID: 301353852</p>
+                </div> -->
+        </div>
+    </div>
+    <script src="js/vendor/jquery-1.11.3.min.js">
+    </script>
+    <script src="js/vendor/webfontloader.js">
+    </script>
+    <script src="js/vendor/jquery.mobile.custom.min.js">
+    </script>
+    <script src="js/vendor/bootstrap.transition.js">
+    </script>
+    <script src="js/vendor/bootstrap.carousel.js">
+    </script>
+    <script src="js/vendor/bootstrap.collapse.js">
+    </script>
+    <script src="js/vendor/bootstrap.dropdown.js">
+    </script>
+    <script src="js/vendor/bootstrap.tab.js">
+    </script>
+    <script src="js/vendor/jquery.drawsvg.js">
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false">
+    </script>
+    <script src="js/default.js">
+    </script>
+    <script src="js/modal.js" type="text/javascript">
+    </script>
+</body>
+
+</html>
