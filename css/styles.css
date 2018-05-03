@@ -55,15 +55,34 @@ p {
  
   }
 
+
+
 a {
   color: #1502ff;
   text-decoration: none;
   background-color: transparent;
   -webkit-text-decoration-skip: objects; }
   a:active, a:hover {
-    color: #0087ff;
+    /*color: #026eff;*/
     outline-width: 0;
-    text-decoration: none; }
+    text-decoration : none;
+    color: white;
+    background-color: #1502ff; }
+
+/*removes highlight for images*/
+a.imagelink{
+color: #1502ff;
+text-decoration: none;
+background-color: transparent;
+-webkit-text-decoration-skip: objects; }
+ a.imagelink:active, a.imagelink:hover {
+    /*color: #026eff;*/
+    outline-width: 0;
+    text-decoration : none;
+    color: transparent;
+    background-color: transparent; }
+
+
 
 
 
